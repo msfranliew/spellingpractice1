@@ -5,69 +5,59 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Spelling Practice</title>
   <style>
-    body { font-family: system-ui, -apple-system, Arial, sans-serif; margin: 24px; max-width: 820px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 12px 0; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    button, input, textarea, select { font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; }
+    body {
+      font-family: system-ui, -apple-system, Arial, sans-serif;
+      margin: 24px;
+      max-width: 820px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button, input, select {
+      font-size: 16px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
     button { cursor: pointer; }
-    .big { font-size: 40px; font-weight: 800; letter-spacing: 0.5px; }
+    .big {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
     .muted { color: #555; }
-    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #f2f2f2; margin-right: 8px; }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #f2f2f2;
+      margin-right: 8px;
+    }
     .ok { color: #0a7a2f; font-weight: 700; }
     .bad { color: #b00020; font-weight: 700; }
     .covered { filter: blur(10px); user-select: none; }
-    textarea { width: 100%; height: 120px; }
   </style>
 </head>
+
 <body>
   <h1>Spelling Practice</h1>
-  <p class="muted">Modes: Look–Cover–Write–Check and Dictation (text-to-speech).</p>
-
-  <div class="card">
-    <h3>1) Word list (teacher can edit)</h3>
-    <p class="muted">One word per line.</p>
-    <textarea id="wordList">
-devastating tsunami
-sprightly
-attempted to rescue
-companion
-inspiration
-shallow
-phenomenon
-scrambled
-occurred
-necessary
-blunder
-gestures
-miscalculation
-misinterpretation
-error in judgement
-learning opportunity
-constructive criticism
-pivotal moment
-epiphany
-stepping stone to success
-
-    </textarea>
-    <div class="row">
-      <label>
-        Mode
-        <select id="mode">
-          <option value="lcwc" selected>Look–Cover–Write–Check</option>
-          <option value="dictation">Dictation (speak the word)</option>
-        </select>
-      </label>
-      <button id="startBtn">Start</button>
-      <button id="resetBtn">Reset</button>
-    </div>
-  </div>
+  <p class="muted">Look–Cover–Write–Check and Dictation</p>
 
   <div class="card">
     <div class="row" style="justify-content: space-between;">
       <div>
         <span class="pill">Progress: <span id="prog">0/0</span></span>
         <span class="pill">Correct: <span id="correct">0</span></span>
-        <span class="pill">Retry list: <span id="retryCount">0</span></span>
+        <span class="pill">Retry: <span id="retryCount">0</span></span>
       </div>
       <div class="muted" id="status">Ready.</div>
     </div>
@@ -81,12 +71,22 @@ stepping stone to success
       <button id="coverBtn" disabled>Cover</button>
       <button id="showBtn" disabled>Show</button>
       <button id="speakBtn" disabled>🔊 Speak</button>
+
+      <label class="muted">
+        Mode
+        <select id="mode">
+          <option value="lcwc" selected>Look–Cover–Write–Check</option>
+          <option value="dictation">Dictation</option>
+        </select>
+      </label>
     </div>
 
     <div class="row" style="margin-top: 12px;">
       <input id="answer" placeholder="Type the spelling…" disabled />
       <button id="checkBtn" disabled>Check</button>
       <button id="nextBtn" disabled>Next</button>
+      <button id="startBtn">Start</button>
+      <button id="resetBtn">Reset</button>
     </div>
 
     <div id="feedback" class="muted" style="margin-top: 10px;"></div>
@@ -101,27 +101,43 @@ stepping stone to success
 <script>
   const el = (id) => document.getElementById(id);
 
+  const DEFAULT_WORDS = [
+    "devastating tsunami",
+    "sprightly",
+    "attempted to rescue",
+    "companion",
+    "inspiration",
+    "shallow",
+    "phenomenon",
+    "scrambled",
+    "occurred",
+    "necessary",
+    "blunder",
+    "gestures",
+    "miscalculation",
+    "misinterpretation",
+    "error in judgement",
+    "learning opportunity",
+    "constructive criticism",
+    "pivotal moment",
+    "epiphany",
+    "stepping stone to success"
+  ];
+
   let words = [];
   let idx = 0;
   let correct = 0;
   let retry = new Set();
   let covered = false;
 
-  function cleanList(text) {
-    return text
-      .split("\n")
-      .map(w => w.trim())
-      .filter(w => w.length > 0);
-  }
-
   function updateStats() {
-    el("prog").textContent = `${Math.min(idx+1, words.length)}/${words.length}`;
-    el("correct").textContent = String(correct);
-    el("retryCount").textContent = String(retry.size);
+    el("prog").textContent = `${Math.min(idx + 1, words.length)}/${words.length}`;
+    el("correct").textContent = correct;
+    el("retryCount").textContent = retry.size;
   }
 
   function currentWord() {
-    return words[idx] ?? "";
+    return words[idx] || "";
   }
 
   function showWord() {
@@ -130,31 +146,22 @@ stepping stone to success
 
   function setCovered(state) {
     covered = state;
-    if (state) el("target").classList.add("covered");
-    else el("target").classList.remove("covered");
+    el("target").classList.toggle("covered", state);
   }
 
   function speak(text) {
-    if (!("speechSynthesis" in window)) {
-      el("feedback").innerHTML = `<span class="bad">Speech not supported</span> on this browser/device.`;
-      return;
-    }
+    if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.9;
-    u.pitch = 1.0;
     window.speechSynthesis.speak(u);
   }
 
   function start() {
-    words = cleanList(el("wordList").value);
-    if (words.length === 0) {
-      el("status").textContent = "Please add at least 1 word.";
-      return;
-    }
+    words = [...DEFAULT_WORDS];
     idx = 0;
     correct = 0;
-    retry = new Set();
+    retry.clear();
 
     el("status").textContent = "Go!";
     el("answer").disabled = false;
@@ -173,11 +180,11 @@ stepping stone to success
     setCovered(false);
     updateStats();
 
-    // If dictation mode, auto-cover
     if (el("mode").value === "dictation") {
       setCovered(true);
       speak(currentWord());
     }
+
     el("answer").focus();
   }
 
@@ -185,7 +192,8 @@ stepping stone to success
     words = [];
     idx = 0;
     correct = 0;
-    retry = new Set();
+    retry.clear();
+
     el("status").textContent = "Ready.";
     el("target").textContent = "—";
     el("answer").value = "";
@@ -195,6 +203,7 @@ stepping stone to success
     el("coverBtn").disabled = true;
     el("showBtn").disabled = true;
     el("speakBtn").disabled = true;
+
     el("feedback").textContent = "";
     el("summary").textContent = "No session yet.";
     el("retryBox").textContent = "";
@@ -205,29 +214,26 @@ stepping stone to success
     const target = currentWord();
     const attempt = el("answer").value.trim();
 
-    if (!target) return;
-
-    if (attempt.length === 0) {
+    if (!attempt) {
       el("feedback").innerHTML = `<span class="bad">Type your spelling first.</span>`;
       return;
     }
 
     if (attempt.toLowerCase() === target.toLowerCase()) {
-      correct += 1;
+      correct++;
       retry.delete(target);
       el("feedback").innerHTML = `<span class="ok">Correct!</span>`;
     } else {
       retry.add(target);
-      el("feedback").innerHTML = `<span class="bad">Not quite.</span> Correct spelling: <b>${target}</b>`;
+      el("feedback").innerHTML =
+        `<span class="bad">Not quite.</span> Correct spelling: <b>${target}</b>`;
     }
 
     updateStats();
   }
 
   function next() {
-    if (words.length === 0) return;
-
-    idx += 1;
+    idx++;
     if (idx >= words.length) {
       finish();
       return;
@@ -257,21 +263,15 @@ stepping stone to success
     el("speakBtn").disabled = true;
 
     const total = words.length;
-    const acc = total === 0 ? "—" : Math.round((correct / total) * 100) + "%";
+    const acc = Math.round((correct / total) * 100) + "%";
 
     el("summary").innerText =
-      `Words: ${total}\n` +
-      `Correct: ${correct}\n` +
-      `Accuracy: ${acc}\n` +
-      `Mode: ${el("mode").selectedOptions[0].text}\n` +
-      `Date: ${new Date().toLocaleString()}`;
+      `Words: ${total}\nCorrect: ${correct}\nAccuracy: ${acc}\nMode: ${el("mode").value}\nDate: ${new Date().toLocaleString()}`;
 
-    if (retry.size > 0) {
-      el("retryBox").innerHTML =
-        `<b>Retry these words:</b><br>` + Array.from(retry).join(", ");
-    } else {
-      el("retryBox").innerHTML = `<span class="ok">No retry words — well done!</span>`;
-    }
+    el("retryBox").innerHTML =
+      retry.size > 0
+        ? `<b>Retry these words:</b><br>${[...retry].join(", ")}`
+        : `<span class="ok">No retry words — well done!</span>`;
   }
 
   el("startBtn").addEventListener("click", start);
@@ -281,11 +281,10 @@ stepping stone to success
   el("coverBtn").addEventListener("click", () => setCovered(true));
   el("showBtn").addEventListener("click", () => setCovered(false));
   el("speakBtn").addEventListener("click", () => speak(currentWord()));
-  el("answer").addEventListener("keydown", (e) => {
+  el("answer").addEventListener("keydown", e => {
     if (e.key === "Enter") check();
   });
 
-  // init
   resetAll();
 </script>
 </body>
