@@ -102,26 +102,26 @@
   const el = (id) => document.getElementById(id);
 
   const DEFAULT_WORDS = [
-    "devastating tsunami",
-    "sprightly",
-    "attempted to rescue",
-    "companion",
-    "inspiration",
-    "shallow",
-    "phenomenon",
-    "scrambled",
-    "occurred",
-    "necessary",
-    "blunder",
-    "gestures",
-    "miscalculation",
-    "misinterpretation",
-    "error in judgement",
-    "learning opportunity",
-    "constructive criticism",
-    "pivotal moment",
-    "epiphany",
-    "stepping stone to success"
+    "absolutely",
+    "compelling",
+    "contempt",
+    "contorted with rage",
+    "exaggerate",
+    "exuberance",
+    "facilities",
+    "feigned injury",
+    "gruff",
+    "happening",
+    "humorous",
+    "immensely",
+    "incidentally",
+    "necessity",
+    "obedience",
+    "penalty",
+    "shoving",
+    "successful",
+    "surged",
+    "unforgettable"
   ];
 
   let words = [];
@@ -225,8 +225,17 @@
       el("feedback").innerHTML = `<span class="ok">Correct!</span>`;
     } else {
       retry.add(target);
+
+      const insertPos = Math.min(idx + 3, words.length);
+
+      // Only reinsert if it is not already appearing soon
+      if (!words.slice(idx + 1, idx + 4).includes(target)) {
+        words.splice(insertPos, 0, target);
+      }
+
       el("feedback").innerHTML =
-        `<span class="bad">Not quite.</span> Correct spelling: <b>${target}</b>`;
+        `<span class="bad">Not quite.</span> Correct spelling: <b>${target}</b><br>
+         <span class="muted">You will see this word again later.</span>`;
     }
 
     updateStats();
