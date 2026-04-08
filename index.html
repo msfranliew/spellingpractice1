@@ -102,26 +102,26 @@
   const el = (id) => document.getElementById(id);
 
   const DEFAULT_WORDS = [
-    "absolutely",
-    "compelling",
-    "contempt",
-    "contorted with rage",
-    "exaggerate",
-    "exuberance",
-    "facilities",
-    "feigned injury",
-    "gruff",
-    "happening",
-    "humorous",
-    "immensely",
-    "incidentally",
-    "necessity",
-    "obedience",
-    "penalty",
-    "shoving",
-    "successful",
-    "surged",
-    "unforgettable"
+    "burrow",
+    "incentive",
+    "hastily",
+    "intriguing",
+    "tantalising treats",
+    "painstakingly",
+    "absurd",
+    "scrutinised",
+    "unbelievably",
+    "triumphantly",
+    "genuinely",
+    "after much deliberation",
+    "in a quandary",
+    "perplexing situation",
+    "paralysed with fear",
+    "blushed with embarrassment",
+    "stood rooted to the ground",
+    "ridden with guilt",
+    "face turned crimson red",
+    "heart was palpitating"
   ];
 
   let words = [];
@@ -228,7 +228,6 @@
 
       const insertPos = Math.min(idx + 3, words.length);
 
-      // Only reinsert if it is not already appearing soon
       if (!words.slice(idx + 1, idx + 4).includes(target)) {
         words.splice(insertPos, 0, target);
       }
