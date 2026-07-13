@@ -2,298 +2,830 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Spelling Practice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Quest</title>
+
   <style>
+    :root {
+      --purple: #6c4cf1;
+      --purple-dark: #4e32c9;
+      --pink: #ff6fae;
+      --yellow: #ffd95a;
+      --green: #22b573;
+      --red: #e84d68;
+      --ink: #26324a;
+      --muted: #667085;
+      --card: rgba(255, 255, 255, 0.94);
+      --shadow: 0 18px 45px rgba(71, 52, 138, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, -apple-system, Arial, sans-serif;
-      margin: 24px;
-      max-width: 820px;
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", system-ui, -apple-system, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,.72) 0 70px, transparent 72px),
+        radial-gradient(circle at 90% 18%, rgba(255,255,255,.58) 0 95px, transparent 97px),
+        linear-gradient(135deg, #d7f4ff 0%, #eee3ff 48%, #ffe9f3 100%);
+      padding: 28px 16px 42px;
+      overflow-x: hidden;
     }
+
+    .app {
+      width: min(920px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      padding: 26px 28px;
+      color: white;
+      background: linear-gradient(135deg, var(--purple), #8b5cf6 55%, var(--pink));
+      box-shadow: var(--shadow);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.15);
+    }
+
+    .hero::before {
+      width: 150px;
+      height: 150px;
+      top: -60px;
+      right: 40px;
+    }
+
+    .hero::after {
+      width: 95px;
+      height: 95px;
+      bottom: -38px;
+      right: 170px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: clamp(32px, 6vw, 52px);
+      line-height: 1;
+      letter-spacing: -1.5px;
+    }
+
+    .title-wrap p {
+      margin: 10px 0 0;
+      font-size: 17px;
+      opacity: .93;
+    }
+
+    .mascot {
+      font-size: 72px;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,.18));
+      animation: float 2.8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 2px solid rgba(255,255,255,.72);
+      border-radius: 18px;
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(83, 55, 150, .10);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      color: var(--purple-dark);
+    }
+
+    .stat span {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
     .card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 12px 0;
+      margin-top: 18px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: 26px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
     }
-    .row {
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .mode-wrap {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .mode-wrap label {
+      font-weight: 800;
+      color: var(--purple-dark);
+    }
+
+    select,
+    input,
+    button {
+      font: inherit;
+    }
+
+    select,
+    input {
+      border: 2px solid #ded7ff;
+      background: white;
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      transition: .2s ease;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 4px rgba(108,76,241,.13);
+    }
+
+    .status {
+      font-weight: 800;
+      color: var(--purple-dark);
+      background: #f0ebff;
+      border-radius: 999px;
+      padding: 9px 14px;
+    }
+
+    .progress-shell {
+      margin-top: 18px;
+      height: 16px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #eeeaf8;
+      border: 2px solid white;
+      box-shadow: inset 0 2px 5px rgba(43,38,80,.10);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--yellow), #ff9f43, var(--pink));
+      transition: width .35s ease;
+    }
+
+    .word-stage {
+      position: relative;
+      margin-top: 22px;
+      min-height: 210px;
+      border-radius: 22px;
+      padding: 26px 18px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background:
+        linear-gradient(rgba(255,255,255,.88), rgba(255,255,255,.88)),
+        repeating-linear-gradient(
+          0deg,
+          #e9e3ff 0px,
+          #e9e3ff 1px,
+          transparent 1px,
+          transparent 34px
+        );
+      border: 3px dashed #c7b9ff;
+      overflow: hidden;
+    }
+
+    .word-label {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      color: var(--purple-dark);
+      text-transform: uppercase;
+    }
+
+    .target {
+      font-size: clamp(38px, 8vw, 70px);
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--purple-dark);
+      transition: .22s ease;
+      overflow-wrap: anywhere;
+    }
+
+    .covered {
+      filter: blur(14px);
+      transform: scale(.97);
+      user-select: none;
+    }
+
+    .word-sparkle {
+      position: absolute;
+      right: 20px;
+      top: 16px;
+      font-size: 28px;
+    }
+
+    .action-row,
+    .answer-row {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      align-items: center;
+      justify-content: center;
+      margin-top: 18px;
     }
-    button, input, select {
-      font-size: 16px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
+
+    button {
+      border: none;
+      border-radius: 15px;
+      padding: 12px 18px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+      box-shadow: 0 7px 0 rgba(52, 42, 113, .15);
     }
-    button { cursor: pointer; }
-    .big {
-      font-size: 40px;
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 rgba(52, 42, 113, .15);
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-purple {
+      color: white;
+      background: linear-gradient(135deg, var(--purple), #8b5cf6);
+    }
+
+    .btn-pink {
+      color: white;
+      background: linear-gradient(135deg, var(--pink), #ff8f70);
+    }
+
+    .btn-yellow {
+      color: #5a4310;
+      background: linear-gradient(135deg, var(--yellow), #ffb84d);
+    }
+
+    .btn-green {
+      color: white;
+      background: linear-gradient(135deg, var(--green), #44d49b);
+    }
+
+    .btn-soft {
+      color: var(--purple-dark);
+      background: #eee9ff;
+    }
+
+    .answer-row input {
+      flex: 1 1 300px;
+      min-width: 0;
+      font-size: 20px;
       font-weight: 800;
-      letter-spacing: 0.5px;
+      text-align: center;
     }
-    .muted { color: #555; }
-    .pill {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #f2f2f2;
-      margin-right: 8px;
+
+    .feedback {
+      min-height: 64px;
+      margin-top: 18px;
+      border-radius: 18px;
+      padding: 15px 16px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      background: #f7f5ff;
+      color: var(--muted);
     }
-    .ok { color: #0a7a2f; font-weight: 700; }
-    .bad { color: #b00020; font-weight: 700; }
-    .covered { filter: blur(10px); user-select: none; }
+
+    .feedback.ok {
+      background: #eafaf2;
+      color: #087a48;
+      border: 2px solid #b8efd5;
+      animation: pop .35s ease;
+    }
+
+    .feedback.bad {
+      background: #fff0f3;
+      color: #b42343;
+      border: 2px solid #ffc7d2;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(.94); }
+      70% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .summary-box {
+      border-radius: 18px;
+      padding: 16px;
+      background: #f8f6ff;
+      border: 2px solid #ece7ff;
+      white-space: pre-line;
+      line-height: 1.6;
+    }
+
+    .celebration {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -30px;
+      font-size: 24px;
+      animation: fall 1.4s linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(540deg);
+        opacity: .9;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero-content {
+        align-items: flex-start;
+      }
+
+      .mascot {
+        font-size: 54px;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 18px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <h1>Spelling Practice</h1>
-  <p class="muted">Look–Cover–Write–Check and Dictation</p>
+  <div class="celebration" id="celebration"></div>
 
-  <div class="card">
-    <div class="row" style="justify-content: space-between;">
-      <div>
-        <span class="pill">Progress: <span id="prog">0/0</span></span>
-        <span class="pill">Correct: <span id="correct">0</span></span>
-        <span class="pill">Retry: <span id="retryCount">0</span></span>
+  <main class="app">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="title-wrap">
+          <h1>Spelling Quest</h1>
+          <p>Look, listen, spell and level up!</p>
+        </div>
+        <div class="mascot" aria-hidden="true">🦉</div>
       </div>
-      <div class="muted" id="status">Ready.</div>
-    </div>
+    </section>
 
-    <div style="margin-top: 14px;">
-      <div class="muted">Target word:</div>
-      <div id="target" class="big">—</div>
-    </div>
+    <section class="stats" aria-label="Session statistics">
+      <div class="stat">
+        <strong id="prog">0/20</strong>
+        <span>Progress</span>
+      </div>
+      <div class="stat">
+        <strong id="correct">0</strong>
+        <span>Correct</span>
+      </div>
+      <div class="stat">
+        <strong id="streak">0 🔥</strong>
+        <span>Streak</span>
+      </div>
+      <div class="stat">
+        <strong id="retryCount">0</strong>
+        <span>Retry Words</span>
+      </div>
+    </section>
 
-    <div class="row" style="margin-top: 12px;">
-      <button id="coverBtn" disabled>Cover</button>
-      <button id="showBtn" disabled>Show</button>
-      <button id="speakBtn" disabled>🔊 Speak</button>
+    <section class="card">
+      <div class="top-row">
+        <div class="mode-wrap">
+          <label for="mode">Choose a mode:</label>
+          <select id="mode">
+            <option value="lcwc" selected>👀 Look–Cover–Write–Check</option>
+            <option value="dictation">🎧 Dictation Challenge</option>
+          </select>
+        </div>
+        <div class="status" id="status">Ready for your quest?</div>
+      </div>
 
-      <label class="muted">
-        Mode
-        <select id="mode">
-          <option value="lcwc" selected>Look–Cover–Write–Check</option>
-          <option value="dictation">Dictation</option>
-        </select>
-      </label>
-    </div>
+      <div class="progress-shell" aria-label="Progress bar">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
 
-    <div class="row" style="margin-top: 12px;">
-      <input id="answer" placeholder="Type the spelling…" disabled />
-      <button id="checkBtn" disabled>Check</button>
-      <button id="nextBtn" disabled>Next</button>
-      <button id="startBtn">Start</button>
-      <button id="resetBtn">Reset</button>
-    </div>
+      <div class="word-stage">
+        <div class="word-label">Target word</div>
+        <div class="word-sparkle">✨</div>
+        <div id="target" class="target">Press Start!</div>
+      </div>
 
-    <div id="feedback" class="muted" style="margin-top: 10px;"></div>
-  </div>
+      <div class="action-row">
+        <button class="btn-soft" id="coverBtn" disabled>🙈 Cover</button>
+        <button class="btn-soft" id="showBtn" disabled>👀 Show</button>
+        <button class="btn-yellow" id="speakBtn" disabled>🔊 Hear Word</button>
+      </div>
 
-  <div class="card">
-    <h3>Session Summary</h3>
-    <div id="summary" class="muted">No session yet.</div>
-    <div id="retryBox" class="muted" style="margin-top:10px;"></div>
-  </div>
+      <div class="answer-row">
+        <input
+          id="answer"
+          placeholder="Type the spelling here..."
+          autocomplete="off"
+          spellcheck="false"
+          disabled
+        />
+        <button class="btn-green" id="checkBtn" disabled>✅ Check</button>
+        <button class="btn-purple" id="nextBtn" disabled>➡️ Next</button>
+      </div>
 
-<script>
-  const el = (id) => document.getElementById(id);
+      <div id="feedback" class="feedback">
+        Choose a mode and press Start.
+      </div>
 
-  const DEFAULT_WORDS = [
-    "interactive games",
-    "initiative",
-    "recognise",
-    "nonetheless",
-    "focused",
-    "miserable",
-    "potential",
-    "accept the proposal",
-    "enthusiasm",
-    "considerable",
-    "beneficial",
-    "definitely",
-    "principal",
-    "full of admiration",
-    "appreciation",
-    "modern world",
-    "annoyance",
-    "integrity",
-    "convincing strategy",
-    "development"
-  ];
+      <div class="action-row">
+        <button class="btn-pink" id="startBtn">🚀 Start Quest</button>
+        <button class="btn-soft" id="resetBtn">🔄 Reset</button>
+      </div>
+    </section>
 
-  let words = [];
-  let idx = 0;
-  let correct = 0;
-  let retry = new Set();
-  let covered = false;
+    <section class="card">
+      <h2 style="margin-top:0;">🏆 Quest Summary</h2>
+      <div class="summary-grid">
+        <div class="summary-box" id="summary">No session yet.</div>
+        <div class="summary-box" id="retryBox">Your retry words will appear here.</div>
+      </div>
+    </section>
+  </main>
 
-  function updateStats() {
-    el("prog").textContent = `${Math.min(idx + 1, words.length)}/${words.length}`;
-    el("correct").textContent = correct;
-    el("retryCount").textContent = retry.size;
-  }
+  <script>
+    const el = (id) => document.getElementById(id);
 
-  function currentWord() {
-    return words[idx] || "";
-  }
+    const DEFAULT_WORDS = [
+      "distinct",
+      "techniques",
+      "execute",
+      "stance",
+      "practitioner",
+      "retaining",
+      "skilful",
+      "combat",
+      "derived",
+      "characteristics",
+      "originated",
+      "elements",
+      "discipline",
+      "relevant",
+      "self-esteem",
+      "superseded",
+      "voracious",
+      "nonchalant",
+      "melancholy",
+      "conceded"
+    ];
 
-  function showWord() {
-    el("target").textContent = currentWord() || "—";
-  }
+    let words = [];
+    let idx = 0;
+    let correct = 0;
+    let streak = 0;
+    let bestStreak = 0;
+    let retry = new Set();
+    let checkedCurrent = false;
 
-  function setCovered(state) {
-    covered = state;
-    el("target").classList.toggle("covered", state);
-  }
-
-  function speak(text) {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.9;
-    window.speechSynthesis.speak(u);
-  }
-
-  function start() {
-    words = [...DEFAULT_WORDS];
-    idx = 0;
-    correct = 0;
-    retry.clear();
-
-    el("status").textContent = "Go!";
-    el("answer").disabled = false;
-    el("checkBtn").disabled = false;
-    el("nextBtn").disabled = false;
-    el("coverBtn").disabled = false;
-    el("showBtn").disabled = false;
-    el("speakBtn").disabled = false;
-
-    el("feedback").textContent = "";
-    el("summary").textContent = "";
-    el("retryBox").textContent = "";
-    el("answer").value = "";
-
-    showWord();
-    setCovered(false);
-    updateStats();
-
-    if (el("mode").value === "dictation") {
-      setCovered(true);
-      speak(currentWord());
+    function currentWord() {
+      return words[idx] || "";
     }
 
-    el("answer").focus();
-  }
+    function updateStats() {
+      const total = words.length || DEFAULT_WORDS.length;
+      const shownProgress = words.length ? Math.min(idx + 1, words.length) : 0;
+      const completed = words.length ? Math.min(idx, words.length) : 0;
 
-  function resetAll() {
-    words = [];
-    idx = 0;
-    correct = 0;
-    retry.clear();
-
-    el("status").textContent = "Ready.";
-    el("target").textContent = "—";
-    el("answer").value = "";
-    el("answer").disabled = true;
-    el("checkBtn").disabled = true;
-    el("nextBtn").disabled = true;
-    el("coverBtn").disabled = true;
-    el("showBtn").disabled = true;
-    el("speakBtn").disabled = true;
-
-    el("feedback").textContent = "";
-    el("summary").textContent = "No session yet.";
-    el("retryBox").textContent = "";
-    updateStats();
-  }
-
-  function check() {
-    const target = currentWord();
-    const attempt = el("answer").value.trim();
-
-    if (!attempt) {
-      el("feedback").innerHTML = `<span class="bad">Type your spelling first.</span>`;
-      return;
+      el("prog").textContent = `${shownProgress}/${total}`;
+      el("correct").textContent = correct;
+      el("streak").textContent = `${streak} 🔥`;
+      el("retryCount").textContent = retry.size;
+      el("progressBar").style.width = `${words.length ? (completed / words.length) * 100 : 0}%`;
     }
 
-    if (attempt.toLowerCase() === target.toLowerCase()) {
-      correct++;
-      retry.delete(target);
-      el("feedback").innerHTML = `<span class="ok">Correct!</span>`;
-    } else {
-      retry.add(target);
+    function showWord() {
+      el("target").textContent = currentWord() || "—";
+    }
 
-      const insertPos = Math.min(idx + 3, words.length);
+    function setCovered(state) {
+      el("target").classList.toggle("covered", state);
+    }
 
-      if (!words.slice(idx + 1, idx + 4).includes(target)) {
-        words.splice(insertPos, 0, target);
+    function setFeedback(message, type = "") {
+      el("feedback").className = `feedback ${type}`.trim();
+      el("feedback").innerHTML = message;
+    }
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) {
+        setFeedback("Speech is not supported by this browser.", "bad");
+        return;
       }
 
-      el("feedback").innerHTML =
-        `<span class="bad">Not quite.</span> Correct spelling: <b>${target}</b><br>
-         <span class="muted">You will see this word again later.</span>`;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.82;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
     }
 
-    updateStats();
-  }
+    function launchConfetti(amount = 26) {
+      const icons = ["⭐", "✨", "🎉", "🌟", "💫"];
+      const box = el("celebration");
 
-  function next() {
-    idx++;
-    if (idx >= words.length) {
-      finish();
-      return;
+      for (let i = 0; i < amount; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti";
+        piece.textContent = icons[Math.floor(Math.random() * icons.length)];
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.animationDelay = `${Math.random() * .35}s`;
+        piece.style.fontSize = `${18 + Math.random() * 18}px`;
+        box.appendChild(piece);
+
+        setTimeout(() => piece.remove(), 1800);
+      }
     }
 
-    el("answer").value = "";
-    el("feedback").textContent = "";
-    showWord();
-    setCovered(false);
-    updateStats();
+    function start() {
+      words = [...DEFAULT_WORDS];
+      idx = 0;
+      correct = 0;
+      streak = 0;
+      bestStreak = 0;
+      retry.clear();
+      checkedCurrent = false;
 
-    if (el("mode").value === "dictation") {
-      setCovered(true);
-      speak(currentWord());
+      el("status").textContent = "Quest in progress!";
+      el("answer").disabled = false;
+      el("checkBtn").disabled = false;
+      el("nextBtn").disabled = false;
+      el("coverBtn").disabled = false;
+      el("showBtn").disabled = false;
+      el("speakBtn").disabled = false;
+
+      el("answer").value = "";
+      el("summary").textContent = "Complete the quest to see your results.";
+      el("retryBox").textContent = "Keep going — you have got this!";
+
+      showWord();
+      setCovered(false);
+      updateStats();
+      setFeedback("Study the word, then cover it and spell it!");
+
+      if (el("mode").value === "dictation") {
+        setCovered(true);
+        speak(currentWord());
+        setFeedback("Listen carefully and type the word you hear.");
+      }
+
+      el("answer").focus();
     }
 
-    el("answer").focus();
-  }
+    function resetAll() {
+      words = [];
+      idx = 0;
+      correct = 0;
+      streak = 0;
+      bestStreak = 0;
+      retry.clear();
+      checkedCurrent = false;
 
-  function finish() {
-    el("status").textContent = "Finished!";
-    el("answer").disabled = true;
-    el("checkBtn").disabled = true;
-    el("nextBtn").disabled = true;
-    el("coverBtn").disabled = true;
-    el("showBtn").disabled = true;
-    el("speakBtn").disabled = true;
+      el("status").textContent = "Ready for your quest?";
+      el("target").textContent = "Press Start!";
+      el("answer").value = "";
+      el("answer").disabled = true;
+      el("checkBtn").disabled = true;
+      el("nextBtn").disabled = true;
+      el("coverBtn").disabled = true;
+      el("showBtn").disabled = true;
+      el("speakBtn").disabled = true;
+      el("summary").textContent = "No session yet.";
+      el("retryBox").textContent = "Your retry words will appear here.";
+      setFeedback("Choose a mode and press Start.");
+      updateStats();
+    }
 
-    const total = words.length;
-    const acc = Math.round((correct / total) * 100) + "%";
+    function check() {
+      if (checkedCurrent) {
+        setFeedback("You have already checked this word. Press Next to continue.");
+        return;
+      }
 
-    el("summary").innerText =
-      `Words: ${total}\nCorrect: ${correct}\nAccuracy: ${acc}\nMode: ${el("mode").value}\nDate: ${new Date().toLocaleString()}`;
+      const target = currentWord();
+      const attempt = el("answer").value.trim();
 
-    el("retryBox").innerHTML =
-      retry.size > 0
-        ? `<b>Retry these words:</b><br>${[...retry].join(", ")}`
-        : `<span class="ok">No retry words — well done!</span>`;
-  }
+      if (!attempt) {
+        setFeedback("Type your spelling first.", "bad");
+        return;
+      }
 
-  el("startBtn").addEventListener("click", start);
-  el("resetBtn").addEventListener("click", resetAll);
-  el("checkBtn").addEventListener("click", check);
-  el("nextBtn").addEventListener("click", next);
-  el("coverBtn").addEventListener("click", () => setCovered(true));
-  el("showBtn").addEventListener("click", () => setCovered(false));
-  el("speakBtn").addEventListener("click", () => speak(currentWord()));
-  el("answer").addEventListener("keydown", e => {
-    if (e.key === "Enter") check();
-  });
+      checkedCurrent = true;
 
-  resetAll();
-</script>
+      if (attempt.toLowerCase() === target.toLowerCase()) {
+        correct++;
+        streak++;
+        bestStreak = Math.max(bestStreak, streak);
+        retry.delete(target);
+
+        const praise = streak >= 3
+          ? `Amazing! ${streak} correct in a row! 🔥`
+          : "Correct! Brilliant spelling! 🌟";
+
+        setFeedback(praise, "ok");
+        launchConfetti(streak >= 3 ? 34 : 18);
+      } else {
+        streak = 0;
+        retry.add(target);
+
+        const insertPos = Math.min(idx + 3, words.length);
+
+        if (!words.slice(idx + 1, idx + 4).includes(target)) {
+          words.splice(insertPos, 0, target);
+        }
+
+        setFeedback(
+          `Almost there! The correct spelling is <strong>${target}</strong>.<br>
+          You will get another chance later.`,
+          "bad"
+        );
+      }
+
+      updateStats();
+    }
+
+    function next() {
+      if (!checkedCurrent) {
+        setFeedback("Check your spelling before moving to the next word.", "bad");
+        return;
+      }
+
+      idx++;
+
+      if (idx >= words.length) {
+        finish();
+        return;
+      }
+
+      checkedCurrent = false;
+      el("answer").value = "";
+      showWord();
+      setCovered(false);
+      updateStats();
+      setFeedback("New word! Take a careful look.");
+
+      if (el("mode").value === "dictation") {
+        setCovered(true);
+        speak(currentWord());
+        setFeedback("Listen carefully and type the word you hear.");
+      }
+
+      el("answer").focus();
+    }
+
+    function finish() {
+      el("status").textContent = "Quest complete!";
+      el("progressBar").style.width = "100%";
+      el("target").textContent = "Well done! 🏆";
+      setCovered(false);
+
+      el("answer").disabled = true;
+      el("checkBtn").disabled = true;
+      el("nextBtn").disabled = true;
+      el("coverBtn").disabled = true;
+      el("showBtn").disabled = true;
+      el("speakBtn").disabled = true;
+
+      const total = words.length;
+      const accuracy = total > 0
+        ? Math.round((correct / total) * 100)
+        : 0;
+
+      const modeName = el("mode").value === "dictation"
+        ? "Dictation Challenge"
+        : "Look–Cover–Write–Check";
+
+      let badge = "Keep practising! 💪";
+      if (accuracy >= 90) badge = "Spelling Superstar! 🌟";
+      else if (accuracy >= 75) badge = "Word Wizard! 🪄";
+      else if (accuracy >= 60) badge = "Great Effort! 🚀";
+
+      el("summary").textContent =
+        `${badge}
+Words attempted: ${total}
+Correct answers: ${correct}
+Accuracy: ${accuracy}%
+Best streak: ${bestStreak}
+Mode: ${modeName}`;
+
+      el("retryBox").innerHTML =
+        retry.size > 0
+          ? `<strong>Practise these words again:</strong><br><br>${[...retry].join(", ")}`
+          : `<strong>Perfect quest!</strong><br><br>No retry words. Fantastic work!`;
+
+      setFeedback(`Quest complete! You scored ${accuracy}%.`, "ok");
+      launchConfetti(55);
+    }
+
+    el("startBtn").addEventListener("click", start);
+    el("resetBtn").addEventListener("click", resetAll);
+    el("checkBtn").addEventListener("click", check);
+    el("nextBtn").addEventListener("click", next);
+    el("coverBtn").addEventListener("click", () => setCovered(true));
+    el("showBtn").addEventListener("click", () => setCovered(false));
+    el("speakBtn").addEventListener("click", () => speak(currentWord()));
+
+    el("answer").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        if (checkedCurrent) next();
+        else check();
+      }
+    });
+
+    el("mode").addEventListener("change", () => {
+      if (!words.length) return;
+
+      checkedCurrent = false;
+      el("answer").value = "";
+      setCovered(el("mode").value === "dictation");
+
+      if (el("mode").value === "dictation") {
+        speak(currentWord());
+        setFeedback("Dictation mode activated. Listen and type!");
+      } else {
+        setFeedback("Look–Cover–Write–Check mode activated.");
+      }
+    });
+
+    resetAll();
+  </script>
 </body>
 </html>
